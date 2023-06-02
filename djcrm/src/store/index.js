@@ -7,7 +7,11 @@ export default new Vuex.Store({
   state: {
     isLoading:false,
     isAuthenticated:false,
-    token:''
+    token:'',
+    user:{
+      id:0,
+      username:''
+    }
 
   },
   getters: {
@@ -17,14 +21,19 @@ export default new Vuex.Store({
       if(localStorage.getItem('token')){
         state.token =localStorage.getItem('token')
         state.isAuthenticated =true
+        state.user.username =localStorage.getItem('username')
+        state.user.id =localStorage.getItem('userid')
       } else{
         state.token =''
         state.isAuthenticated =false
+        state.user.id=0
+        state.user.username=''
       }
 
     },
     setIsLoading(state,status){
-      state.isLoading=status
+      state.isLoading= status
+
     },
 
     setToken(state,token){
@@ -36,7 +45,10 @@ export default new Vuex.Store({
     removeToken(state){
       state.token=''
       state.isAuthenticated=false
-    }
+    },
+    setUser(state,user){
+      state.user=user
+    },
   },
   actions: {
   },

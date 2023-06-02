@@ -63,7 +63,7 @@ export default {
     };
   },
   methods: {
-    submitForm() {
+    async submitForm() {
       this.error = [];
 
       if (this.username == "") {
@@ -78,14 +78,16 @@ export default {
         this.errors.push("The password is not matching");
       }
       if (!this.errors.length) {
+        this.$store.commit("setIsLoading", true);
+
         const formData = {
           username: this.username,
           password: this.password,
         };
 
-        axios
+        await axios
           .post("http://127.0.0.1:8000/api/v1/users/", formData)
-          .then(response => {
+          .then((response) => {
             toast({
               message: "Account was created ,please log in",
               type: "is-success",
@@ -103,10 +105,12 @@ export default {
                   `${property}: ${error.response.data[property]}`
                 );
               }
-            } else if (error.response) {
+            } else if (error.message) {
               this.errors.push("something went wrong.please try again!");
             }
           });
+
+        this.$store.commit("setIsLoading", false);
       }
     },
   },

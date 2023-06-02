@@ -47,7 +47,9 @@ export default {
     };
   },
   methods: {
-    submitForm() {
+    async submitForm() {
+      this.$store.commit("setIsLoading", true);
+
       axios.defaults.headers.common["Authorization"] = "";
       localStorage.removeItem("token");
 
@@ -56,9 +58,9 @@ export default {
         password: this.password,
       };
 
-      axios
+      await axios
         .post("http://127.0.0.1:8000/api/v1/token/login/", formData)
-        .then(response => {
+        .then((response) => {
           const token = response.data.auth_token;
 
           this.$store.commit("setToken", token);
@@ -66,7 +68,7 @@ export default {
           axios.defaults.headers.common["Authorization"] = "Token " + token;
           localStorage.setItem("token", token);
 
-          this.$router.push("/dashboard/my-account");
+          
         })
 
         .catch((error) => {
@@ -78,6 +80,24 @@ export default {
             this.errors.push("something went wrong.please try again!");
           }
         });
+      await axios
+        .get('http://127.0.0.1:8000/api/v1/users/me')
+        .then((response) => {
+          this.$store.commit("setUser", {
+            'id': response.data.id,
+            'username': response.data.username,
+          });
+
+          localStorage.setItem("username", response.data.username);
+          localStorage.setItem("userid", response.data.id);
+
+          this.$router.push("/dashboard/my-account");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      this.$store.commit("setIsLoading", false);
     },
   },
 };
